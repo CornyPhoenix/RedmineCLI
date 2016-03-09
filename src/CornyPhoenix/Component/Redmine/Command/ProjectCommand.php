@@ -15,15 +15,15 @@ use CornyPhoenix\Component\Redmine\Model\Project;
 class ProjectCommand extends Command
 {
 
-    const LIST = 'list';
-    const SELECT = 'select';
+    const ACTION_LIST = 'list';
+    const ACTION_SELECT = 'select';
 
     protected function configure()
     {
         $this
             ->setName('project')
             ->setDescription('List, select and edit projects on Redmine')
-            ->addArgument('action', InputArgument::OPTIONAL, 'Action to perform with projects', self::LIST)
+            ->addArgument('action', InputArgument::OPTIONAL, 'Action to perform with projects', self::ACTION_LIST)
         ;
     }
 
@@ -31,7 +31,7 @@ class ProjectCommand extends Command
     {
         $memberships = $this->getApplication()->getCurrentUser()->getMemberships();
         switch ($input->getArgument('action')) {
-            case self::LIST:
+            case self::ACTION_LIST:
                 foreach ($memberships as $membership) {
                     $id = $membership['project']['id'];
                     if ($this->getProject() && $this->getProject()->getId() === $id) {
@@ -43,7 +43,7 @@ class ProjectCommand extends Command
                 }
                 break;
 
-            case self::SELECT:
+            case self::ACTION_SELECT:
                 $projects = array_map(function ($arg) {
                     return $arg['project']['name'];
                 }, $memberships);

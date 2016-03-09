@@ -17,7 +17,7 @@ class Application extends BaseApplication
 {
 
     const NAME = 'Redmine CLI';
-    const VERSION = '0.1.0';
+    const VERSION = '0.0.1';
 
     /**
      * @var Client
