@@ -1,13 +1,11 @@
 <?php
-/*
- * (C) 2016 ${USER_NAME}
- */
 
 namespace CornyPhoenix\Component\Redmine;
 
 
 use CornyPhoenix\Component\Redmine\Model\Project;
 use CornyPhoenix\Component\Redmine\Model\User;
+use CornyPhoenix\Component\Redmine\Token\ApiKeyToken;
 use Redmine\Client;
 use Symfony\Component\Serializer\Serializer;
 
@@ -15,66 +13,71 @@ class ConfigLoader
 {
 
     /**
+     * @var string
+     */
+    private $configFilename;
+
+    /**
      * @var Serializer
      */
     private $serializer;
+
     /**
-     * @var Application
+     * @var Redmine
      */
-    private $application;
+    private $redmine;
 
     /**
      * ConfigLoader constructor.
+     * @param string $configFilename
      * @param Serializer $serializer
-     * @param Application $application
+     * @param Redmine $redmine
      */
-    public function __construct(Serializer $serializer, Application $application)
+    public function __construct($configFilename, Serializer $serializer, Redmine $redmine)
     {
         $this->serializer = $serializer;
-        $this->application = $application;
+        $this->redmine = $redmine;
+        $this->configFilename = $configFilename;
     }
 
-    /**
-     * @param string $filename
-     */
-    public function loadFromConfig($filename)
+    public function loadFromConfig()
     {
         // Load from config
-        if (file_exists($filename)) {
-            $json = $this->serializer->decode(file_get_contents($filename), 'json');
-
-            if (isset($json['api']) && isset($json['key'])) {
-                $this->application->setClient(new Client($json['api'], $json['key']));
-            }
-
-            if (isset($json['project'])) {
-                $this->application->setCurrentProject($this->serializer->denormalize($json['project'], Project::class));
-            }
-
-            if (isset($json['user'])) {
-                $this->application->setCurrentUser($this->serializer->denormalize($json['user'], User::class));
-            }
+        if (!file_exists($this->configFilename)) {
+            return false;
         }
+
+        $json = $this->serializer->decode(file_get_contents($this->configFilename), 'json');
+
+        if (isset($json['api']) && isset($json['key'])) {
+            $this->redmine->connect($json['api'], new ApiKeyToken($json['key']));
+        }
+
+        if (isset($json['project'])) {
+            $this->redmine->setCurrentProject($this->serializer->denormalize($json['project'], Project::class));
+        }
+
+        if (isset($json['user'])) {
+            $this->redmine->setCurrentUser($this->serializer->denormalize($json['user'], User::class));
+        }
+
+        return true;
     }
 
-    /**
-     * @param string $filename
-     */
-    public function saveToConfig($filename)
+    public function saveToConfig()
     {
+        $json = ['is_connected' => $this->redmine->isConnected()];
+
         // Save to config
-        if (null !== $this->application->getClient()) {
-            $client = $this->application->getClient();
-            $json = [
-                'api' => $client->getUrl(),
-                'key' => $this->application->getCurrentUser()->getApiKey(),
-                'project' => $this->serializer->normalize($this->application->getCurrentProject()),
-                'user' => $this->serializer->normalize($this->application->getCurrentUser()),
-            ];
+        if ($this->redmine->isConnected()) {
+            $json['api'] = $this->redmine->getEndpoint();
+            $json['key'] = $this->redmine->getCurrentUser()->getApiKey();
+            $json['project'] = $this->serializer->normalize($this->redmine->getCurrentProject());
+            $json['user'] = $this->serializer->normalize($this->redmine->getCurrentUser());
 
             $json = $this->serializer->encode($json, 'json');
 
-            if (false === file_put_contents($filename, $json)) {
+            if (false === file_put_contents($this->configFilename, $json)) {
                 throw new \RuntimeException('Could not save application state to ~/.redmine');
             }
         }

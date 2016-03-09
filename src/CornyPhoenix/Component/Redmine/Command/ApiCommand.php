@@ -3,6 +3,8 @@
 namespace CornyPhoenix\Component\Redmine\Command;
 
 use CornyPhoenix\Component\Redmine\Model\User;
+use CornyPhoenix\Component\Redmine\Token\ApiKeyToken;
+use CornyPhoenix\Component\Redmine\Token\UsernamePasswordToken;
 use Redmine\Client;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,55 +28,44 @@ class ApiCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Retrieve login information
         $url = $input->getArgument('url');
+        $token = $this->createLoginToken($input, $output);
 
-        /** @var QuestionHelper $helper */
-        $helper = $this->getHelper('question');
+        // Connect to redmine server and retrieve login
+        $this->redmine->connect($url, $token);
+        $this->redmine->updateCurrentUser();
 
-        $key = $this->getApiKey($input, $output, $helper);
-        if (null === $key) {
-            $question = new Question('<question> Username </question> ');
-            $username = $helper->ask($input, $output, $question);
-
-            $question = new Question('<question> Password </question> ');
-            $question->setHidden(true);
-            $password = $helper->ask($input, $output, $question);
-
-            $client = new Client($url, $username, $password);
-        } else {
-            $client = new Client($url, $key);
-        }
-
-        $this->getApplication()->setClient($client);
-
-        $user = $client->user->getCurrentUser()['user'];
-        if ($client->user->lastCallFailed()) {
-            throw new \RuntimeException('API key was wrong! Could not connect to ' . $client->getUrl());
-        }
-
-        $user = $this->getApplication()->getSerializer()->denormalize($user, User::class);
-        $this->getApplication()->setCurrentUser($user);
-
-        $firstname = $this->getApplication()->getCurrentUser()->getFirstname();
-        $lastname = $this->getApplication()->getCurrentUser()->getLastname();
-        $output->writeln("Welcome, <info>$firstname $lastname</info>!");
+        // Display welcome message
+        $user = $this->redmine->getCurrentUser();
+        $name = $user->getFirstname() . ' ' . $user->getLastname();
+        $output->writeln("Hi, <info>$name</info>!");
     }
 
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @param $helper
-     * @return string|null
+     * @return ApiKeyToken|UsernamePasswordToken
      */
-    private function getApiKey(InputInterface $input, OutputInterface $output, $helper)
+    protected function createLoginToken(InputInterface $input, OutputInterface $output)
     {
-        if (null !== $input->getOption('key')) {
-            return $input->getOption('key');
+        /** @var QuestionHelper $helper */
+        $helper = $this->getHelper('question');
+
+        $apiKey = $input->getOption('key');
+        if (null === $apiKey) {
+            $question = new Question('<question>Username:</question> ');
+            $username = $helper->ask($input, $output, $question);
+
+            $question = new Question('<question>Password:</question> ');
+            $question->setHidden(true);
+            $password = $helper->ask($input, $output, $question);
+
+            $token = new UsernamePasswordToken($username, $password);
+            return $token;
+        } else {
+            $token = new ApiKeyToken($apiKey);
+            return $token;
         }
-
-        $question = new Question('<question> Redmine API key </question> (none) ');
-        $key = $this->getHelper('question')->ask($input, $output, $question);
-
-        return $key;
     }
 }

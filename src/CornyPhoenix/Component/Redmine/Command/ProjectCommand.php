@@ -3,6 +3,7 @@
 namespace CornyPhoenix\Component\Redmine\Command;
 
 use Redmine\Client;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ class ProjectCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $memberships = $this->getApplication()->getCurrentUser()->getMemberships();
+        $memberships = $this->redmine->getCurrentUser()->getMemberships();
         switch ($input->getArgument('action')) {
             case self::ACTION_LIST:
                 foreach ($memberships as $membership) {
@@ -59,11 +60,13 @@ class ProjectCommand extends Command
                     }
                 }
 
-                $projectArray = $this->getRedmine()->project->show($id)['project'];
-                $project = $this->getApplication()->getSerializer()->denormalize($projectArray, Project::class);
+                // Retrieve the current project.
+                $project = $this->redmine->getProjectRepository()->find($id);
+                if (null === $project) {
+                    throw new LogicException('Could not retrieve login ');
+                }
 
-                $this->getApplication()->setCurrentProject($project);
-
+                $this->redmine->setCurrentProject($project);
                 break;
         }
     }

@@ -2,7 +2,6 @@
 
 namespace CornyPhoenix\Component\Redmine;
 
-use Redmine\Client;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,8 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\Serializer;
 use CornyPhoenix\Component\Redmine\Command\ApiCommand;
 use CornyPhoenix\Component\Redmine\Command\ProjectCommand;
-use CornyPhoenix\Component\Redmine\Model\Project;
-use CornyPhoenix\Component\Redmine\Model\User;
 
 class Application extends BaseApplication
 {
@@ -20,29 +17,19 @@ class Application extends BaseApplication
     const VERSION = '0.0.2';
 
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var Serializer
      */
     private $serializer;
 
     /**
-     * @var User
-     */
-    private $currentUser;
-
-    /**
-     * @var Project
-     */
-    private $currentProject;
-
-    /**
      * @var ConfigLoader
      */
     private $configLoader;
+
+    /**
+     * @var Redmine
+     */
+    private $redmine;
 
     /**
      * Application constructor.
@@ -52,10 +39,11 @@ class Application extends BaseApplication
     {
         parent::__construct(self::NAME, self::VERSION);
 
+        $this->redmine = new Redmine($serializer);
         $this->serializer = $serializer;
-        $this->configLoader = new ConfigLoader($serializer, $this);
+        $this->configLoader = new ConfigLoader(getenv('HOME') . '/.redmine', $this->serializer, $this->redmine);
 
-        $this->configLoader->loadFromConfig(self::getConfigFilename());
+        $this->configLoader->loadFromConfig();
         $this->initCommands();
     }
 
@@ -64,7 +52,50 @@ class Application extends BaseApplication
      */
     public function __destruct()
     {
-        $this->configLoader->saveToConfig(self::getConfigFilename());
+        $this->configLoader->saveToConfig();
+        $this->redmine->disconnect();
+    }
+
+    /**
+     * @return Serializer
+     */
+    public function getSerializer()
+    {
+        return $this->serializer;
+    }
+
+    /**
+     * @return Redmine
+     */
+    public function getRedmine()
+    {
+        return $this->redmine;
+    }
+
+    /**
+     * @return ConfigLoader
+     */
+    public function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
+
+    public function getHelp()
+    {
+        $help = parent::getHelp();
+        $help .= PHP_EOL;
+        $help .= "Copyright (c) 2016 Konstantin Simon Maria Möllers";
+
+        return $help;
+    }
+
+    /**
+     * Initializes commands of this tool.
+     */
+    protected function initCommands()
+    {
+        $this->add(new ApiCommand());
+        $this->add(new ProjectCommand());
     }
 
     /**
@@ -79,81 +110,5 @@ class Application extends BaseApplication
 
         $style = new OutputFormatterStyle(null, null, array('bold'));
         $formatter->setStyle('strong', $style);
-    }
-
-    /**
-     * @return Client
-     */
-    public function getClient()
-    {
-        return $this->client;
-    }
-
-    /**
-     * @param Client $client
-     * @return $this
-     */
-    public function setClient(Client $client = null)
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * @return Serializer
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
-    }
-
-    /**
-     * @return User
-     */
-    public function getCurrentUser()
-    {
-        return $this->currentUser;
-    }
-
-    /**
-     * @param User $user
-     */
-    public function setCurrentUser(User $user = null)
-    {
-        $this->currentUser = $user;
-    }
-
-    /**
-     * @return Project
-     */
-    public function getCurrentProject()
-    {
-        return $this->currentProject;
-    }
-
-    /**
-     * @param Project|int $project
-     * @return $this
-     */
-    public function setCurrentProject(Project $project = null)
-    {
-        $this->currentProject = $project;
-
-        return $this;
-    }
-
-    protected function initCommands()
-    {
-        $this->add(new ApiCommand());
-        $this->add(new ProjectCommand());
-    }
-
-    /**
-     * @return string
-     */
-    public static function getConfigFilename()
-    {
-        return $configFile = getenv('HOME') . '/.redmine';
     }
 }
