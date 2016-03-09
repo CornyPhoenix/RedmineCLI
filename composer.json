@@ -1,0 +1,20 @@
+{
+  "name": "xeonlab/redmine-cli",
+  "description": "Command line tool to work with Redmine.",
+  "type": "tool",
+  "require": {
+    "php": ">=5.6",
+    "symfony/console": "^3.0",
+    "kbsali/redmine-api": "^1.5",
+    "symfony/serializer": "^3.0",
+    "symfony/property-access": "^3.0"
+  },
+  "license": "MIT",
+  "autoload": {"psr-0": {"": "src/"}},
+  "authors": [
+    {
+      "name": "Konstantin Möllers",
+      "email": "ksm.moellers@gmail.com"
+    }
+  ]
+}
