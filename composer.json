@@ -13,7 +13,7 @@
   "require-dev": {
     "clue/phar-composer": "^1.0@dev"
   },
-  "bin": ["application.php"],
+  "bin": ["bin/redmine"],
   "license": "MIT",
   "autoload": {"psr-0": {"CornyPhoenix\\Component\\Redmine": "src/"}},
   "authors": [
