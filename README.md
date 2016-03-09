@@ -1,4 +1,4 @@
-Redmine CLI 0.0.1
+Redmine CLI 0.0.2
 =================
 
 > Command line tool written in PHP to communicate with your Redmine server.
