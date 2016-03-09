@@ -104,7 +104,7 @@ class GetSetMethodNormalizer extends BaseNormalizer
                             throw new RuntimeException('Attribute ' . $attribute . ' may not be null');
                         }
 
-                        if ($parameter->hasType() && 'array' === $parameter->getType()->__toString()) {
+                        if ($parameter->getType() && 'array' === $parameter->getType()->__toString()) {
                             $value = (array) $value;
                         }
 
