@@ -17,3 +17,7 @@ Available commands to interact with Redmine:
     - Lists all your available projects
 * `redmine project select`
     - Selects the active project you work on
+
+## License
+
+This tool is available under the [MIT license](LICENSE.md).
