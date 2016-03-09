@@ -104,10 +104,6 @@ class GetSetMethodNormalizer extends BaseNormalizer
                             throw new RuntimeException('Attribute ' . $attribute . ' may not be null');
                         }
 
-                        if ($parameter->getType() && 'array' === $parameter->getType()->__toString()) {
-                            $value = (array) $value;
-                        }
-
                         if ($class = $parameter->getClass()) {
                             if (!$this->serializer instanceof DenormalizerInterface) {
                                 throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
