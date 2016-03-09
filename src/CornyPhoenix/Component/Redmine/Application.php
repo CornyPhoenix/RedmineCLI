@@ -2,6 +2,7 @@
 
 namespace CornyPhoenix\Component\Redmine;
 
+use CornyPhoenix\Component\Redmine\Command\InfoCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -96,6 +97,7 @@ class Application extends BaseApplication
     {
         $this->add(new ApiCommand());
         $this->add(new ProjectCommand());
+        $this->add(new InfoCommand());
     }
 
     /**
