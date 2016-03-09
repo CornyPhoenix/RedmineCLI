@@ -1,10 +1,11 @@
-v0.0.2
-======
+Changenotes
+===========
+
+## v0.0.2
 - Move binary to `bin` directory.
 - Add build script for **redmine.phar**.
 
-v0.0.1
-======
+## v0.0.1
 - Connect to a Redmine endpoint via `redmine api`.
 - Retrieve login information.
 - Retrieve all available projects via `redmine project`.
