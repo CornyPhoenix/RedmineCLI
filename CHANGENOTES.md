@@ -1,3 +1,8 @@
+v0.0.2
+======
+- Move binary to `bin` directory.
+- Add build script for **redmine.phar**.
+
 v0.0.1
 ======
 - Connect to a Redmine endpoint via `redmine api`.

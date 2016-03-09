@@ -1,21 +1,28 @@
 {
   "name": "corny-phoenix/redmine-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Command line tool to work with Redmine.",
   "type": "tool",
   "require": {
     "php": ">=5.6",
-    "symfony/console": "^3.0",
+    "symfony/console": "^2.8|^3.0",
     "kbsali/redmine-api": "^1.5",
     "symfony/serializer": "^3.0",
     "symfony/property-access": "^3.0"
   },
+  "require-dev": {
+    "clue/phar-composer": "^1.0@dev"
+  },
+  "bin": ["bin/redmine"],
   "license": "MIT",
-  "autoload": {"psr-0": {"": "src/"}},
+  "autoload": {"psr-0": {"CornyPhoenix\\Component\\Redmine": "src/"}},
   "authors": [
     {
       "name": "Konstantin Möllers",
       "email": "ksm.moellers@gmail.com"
     }
-  ]
+  ],
+  "scripts": {
+    "build": "bin/phar-composer build . redmine.phar"
+  }
 }
