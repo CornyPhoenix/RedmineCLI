@@ -2,6 +2,8 @@
 
 namespace CornyPhoenix\Component\Redmine\Model;
 
+use Carbon\Carbon;
+
 class Project
 {
 
@@ -62,12 +64,12 @@ class Project
     private $issue_categories;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      */
     private $created_on;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      */
     private $updated_on;
 
@@ -270,7 +272,7 @@ class Project
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getCreatedOn()
     {
@@ -278,17 +280,17 @@ class Project
     }
 
     /**
-     * @param \DateTime $created_on
+     * @param Carbon $created_on
      * @return $this
      */
-    public function setCreatedOn(\DateTime $created_on)
+    public function setCreatedOn(Carbon $created_on)
     {
         $this->created_on = $created_on;
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getUpdatedOn()
     {
@@ -296,10 +298,10 @@ class Project
     }
 
     /**
-     * @param \DateTime $updated_on
+     * @param Carbon $updated_on
      * @return $this
      */
-    public function setUpdatedOn(\DateTime $updated_on)
+    public function setUpdatedOn(Carbon $updated_on)
     {
         $this->updated_on = $updated_on;
         return $this;

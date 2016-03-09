@@ -6,10 +6,11 @@
 namespace CornyPhoenix\Component\Redmine\Normalizer;
 
 
+use Carbon\Carbon;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
+class CarbonNormalizer implements NormalizerInterface, DenormalizerInterface
 {
 
     /**
@@ -23,7 +24,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        if ($object instanceof \DateTime) {
+        if ($object instanceof Carbon) {
             return $object->format('Y-m-d\TH:i:s\Z');
         }
 
@@ -42,7 +43,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        return new \DateTime($data);
+        return new Carbon($data);
     }
 
     /**
@@ -55,7 +56,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return $data instanceof \DateTime;
+        return $data instanceof Carbon;
     }
 
     /**
@@ -69,6 +70,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return \DateTime::class === $type && is_string($data) && 20 === strlen($data);
+        return Carbon::class === $type && is_string($data) && 20 === strlen($data);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace CornyPhoenix\Component\Redmine\Model;
 
+use Carbon\Carbon;
+
 class User
 {
 
@@ -31,12 +33,12 @@ class User
     private $mail;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      */
     private $created_on;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      */
     private $last_login_on;
 
@@ -141,7 +143,7 @@ class User
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getCreatedOn()
     {
@@ -149,17 +151,17 @@ class User
     }
 
     /**
-     * @param \DateTime $created_on
+     * @param Carbon $created_on
      * @return $this
      */
-    public function setCreatedOn(\DateTime $created_on)
+    public function setCreatedOn(Carbon $created_on)
     {
         $this->created_on = $created_on;
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getLastLoginOn()
     {
@@ -167,10 +169,10 @@ class User
     }
 
     /**
-     * @param \DateTime $last_login_on
+     * @param Carbon $last_login_on
      * @return $this
      */
-    public function setLastLoginOn(\DateTime $last_login_on)
+    public function setLastLoginOn(Carbon $last_login_on)
     {
         $this->last_login_on = $last_login_on;
         return $this;
